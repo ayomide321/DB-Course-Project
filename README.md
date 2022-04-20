@@ -5,3 +5,8 @@ Steps to complete:
 3. Create login functions
 4. Load data into database
 5. Build website
+
+
+How to Setup:
+pip install requirements.txt
+
