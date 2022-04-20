@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+        table, th, td {
+            border: 1px solid;
+        }
+    </style>
+    <form method="post" action="/">
+        <select name="teamID">
+            {% for each in teamPlayers %}
+                <option value="{{each.teamID}}" {% if each.teamID == teamID %} selected {% endif %}>{{each.name}}</option>
+            {% endfor %}
+        </select>
+
+        <select name="yearID">
+            {% for each in teamYears %}
+                <option value="{{each.yearID}}" {% if each.yearID == yearIDSet %} selected {% endif %}>{{each.yearID}}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Submit"/>
+    </form>
+
+    {% if allFielding %}
+    <table>
+        <tr>
+            <td>Player Name</td>
+            <td>Player Position</td>
+            <td>Time Played</td>
+        </tr>
+        {% for row in allFielding %}
+        <tr>
+            <td>
+                <a href= "{{url_for('player', urlPlayerID=row.playerID)}}">{{getName(row.playerID)}}</a>
+            </td>
+            <td>
+                {{posName(row.position) if row.position}}
+            </td>
+            <td>
+                {{row.f_InnOuts if row.f_InnOuts else 'No Time Recorded'}}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+    {% endif %}
+
+{% endblock %}

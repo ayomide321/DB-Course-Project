@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - Pine Beetle</title>
+        {% else %}
+        <title>Welcome to Data Base</title>
+        {% endif %}
+    </head>
+    <body>
+        <div>
+            Pine Beetle:
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('player') }}">Player Search</a>
+            {% if current_user.is_anonymous %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% else %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+            {% endif %}
+            {% if current_user.username == 'ayomide321'%}
+            <a href="{{ url_for('adminpage') }}">Audits</a>
+            {% endif %}
+        </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </body>
+</html>

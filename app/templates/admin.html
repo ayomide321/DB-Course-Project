@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+    {% if current_user.username == 'ayomide321'%}
+        <style>
+            th, td {
+                padding: 5px;
+                text-align: left;
+            }
+            table, th, td {
+                border: 1px solid;
+            }
+        </style>
+        <form method="post" action="/adminpage">
+            <label>Select User To Track</label>
+            <select name="userID">
+                {% for each in auditUsers %}
+                    <option value="{{each.username}}" {% if each.username == username %} selected {% endif %}>{{each.username}}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Submit"/>
+        </form>
+        <br>
+        {% if allTracking %}
+        <table>
+            <tr>
+                <td>Username</td>
+                <td>User Action</td>
+                <td>Time of Action</td>
+            </tr>
+            {% for row in allTracking %}
+            <tr>
+                <td>
+                    {{row.username}}
+                </td>
+                <td>
+                    {{row.user_action}}
+                </td>
+                <td>
+                    {{row.time_action}}
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+        {% endif %}
+
+
+    {% else %}
+        <h1>Oy, you don't have permission to access this website. Get outta here</h1>
+    {% endif %}
+
+{% endblock %}
