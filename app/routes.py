@@ -6,6 +6,12 @@ from app.forms import LoginForm, RegistrationForm
 from app.models import User, People, Batting, Pitching, Fielding, Team, AuditTrail
 from datetime import datetime
 
+
+@app.context_processor
+def inject_user():
+    return dict(ADMIN_NAME=app.config.get('ADMIN_NAME'))
+
+
 def getTeamName(teamID):
     return Team.query.filter_by(teamID=teamID).first().name
 
@@ -19,10 +25,13 @@ def getPositionName(positionID):
     positionDic = {'SS' : 'Shortstop',
                     '2B': '2nd Baseman',
                     'OF': 'Outfielder',
-                    'C' : 'Center Field',
+                    'C' : 'Catcher',
                     '1B': '1st Baseman',
                     '3B': '3rd Baseman',
-                    'P' : 'Pitcher'}
+                    'P' : 'Pitcher',
+                    'LF': 'Left Field',
+                    'RF': 'Right Field',
+                    'CF': 'Center Field',}
     return positionDic[positionID]
 
 def logAuditTrail(**kwargs):
@@ -51,7 +60,7 @@ def adminpage():
     username = ""
     if(current_user.is_anonymous):
         logAuditTrail(actionType="Unauthorized access to admin page")
-    elif(current_user.username != 'ayomide321'):
+    elif(current_user.username != app.config.get('ADMIN_NAME')):
         logAuditTrail(actionType="Unauthorized access to admin page")
     allTracking = ""
     auditUsers = AuditTrail.query.with_entities(AuditTrail.username).distinct(AuditTrail.username).all()
@@ -68,7 +77,7 @@ def index():
     teamID = ''
     yearID = 0
     allFielding = ''
-    currentTeams = Team.query.all()
+    currentTeams = Team.query.with_entities(Team.teamID, Team.name).distinct(Team.name).all()
     currentYears = Team.query.with_entities(Team.yearID).distinct(Team.yearID).all()
 
     if request.method == "POST":

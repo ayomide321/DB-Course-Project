@@ -11,9 +11,9 @@
         }
     </style>
     <form method="post" action="/">
-        <select name="teamID">
+        <select name="teamID" id="teamSelect">
             {% for each in teamPlayers %}
-                <option value="{{each.teamID}}" {% if each.teamID == teamID %} selected {% endif %}>{{each.name}}</option>
+                <option value="{{each.teamID}}" {% if each.teamID == teamID %} selected {% endif %}>{{each.name}} | {{each.teamID}}</option>
             {% endfor %}
         </select>
 
