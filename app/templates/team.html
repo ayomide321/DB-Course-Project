@@ -17,7 +17,7 @@
             {% endfor %}
         </select>
 
-        <select name="yearID">
+        <select name="yearID" id="yearSelect">
             {% for each in teamYears %}
                 <option value="{{each.yearID}}" {% if each.yearID == yearIDSet %} selected {% endif %}>{{each.yearID}}</option>
             {% endfor %}
@@ -49,4 +49,20 @@
     </table>
     {% endif %}
 
+    <script src="https://code.jquery.com/jquery-1.12.4.js" type="text/javascript"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+        $('#teamSelect').change(function(){
+
+          $.getJSON('/_update_dropdown', {
+            selected_class: $('#teamSelect').val()
+
+          }).success(function(data) {
+                $('#yearSelect').html(data.html_string_selected);
+           })
+        });
+      });
+    </script>
 {% endblock %}

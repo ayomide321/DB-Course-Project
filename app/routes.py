@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
@@ -70,30 +70,41 @@ def adminpage():
 
     return render_template('admin.html', auditUsers=auditUsers, allTracking=allTracking, username=username)
 
+@app.route('/_update_dropdown')
+def update_dropdown():
+    selected_team = request.args.get('selected_class', type=str)
+    currentYears = Team.query.filter_by(teamID=selected_team).with_entities(Team.yearID).distinct(Team.yearID).all()
+    html_string_selected = ''
+    for years in currentYears:
+        html_string_selected += '<option value="{}">{}</option>'.format(years.yearID, years.yearID)
+
+    return jsonify(html_string_selected=html_string_selected)
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index')
 @login_required
 def index():
-    teamID = ''
+    teamID = 'ALT'
     yearID = 0
     allFielding = ''
-    currentTeams = Team.query.with_entities(Team.teamID, Team.name).distinct(Team.name).all()
-    currentYears = Team.query.with_entities(Team.yearID).distinct(Team.yearID).all()
+    currentTeams = Team.query.with_entities(Team.teamID, Team.name).distinct(Team.name).order_by(Team.name).all()
+    
 
     if request.method == "POST":
         teamID = request.form.get('teamID')
         yearID = request.form.get('yearID')
-        if(yearID):
-            int(yearID)
+        
         logAuditTrail(actionType="Search By Team", teamID=teamID, yearID=yearID)
-        allFielding = Fielding.query.filter_by(teamID=teamID, yearID=yearID).all()
+        allFielding = Fielding.query.filter_by(teamID=teamID, yearID=yearID).order_by().all()
     else:
         logAuditTrail(actionType="Load Home Page")
+    print(yearID)
+    currentYears = Team.query.filter_by(teamID=teamID).with_entities(Team.yearID).distinct(Team.yearID).all()
 
     return render_template('team.html', teamPlayers=currentTeams, teamYears = currentYears,
                             allFielding = allFielding, getName = getPlayerName,
                             posName=getPositionName, teamID = teamID,
-                            yearIDSet = yearID)
+                            yearIDSet=int(yearID))
 
 
 @app.route('/players', defaults={'urlPlayerID': None}, methods=['GET', 'POST'])
