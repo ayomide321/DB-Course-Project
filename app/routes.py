@@ -19,6 +19,7 @@ def playerImage(playerID):
     url_fetch = "https://www.baseball-reference.com/players/" + playerID[0] + "/" + playerID + ".shtml"
     fd = urlopen(url_fetch).read()
 
+
     return url_fetch
 
 def getTeamName(teamID):
@@ -35,7 +36,8 @@ def runsCreated(playerID, yearID):
     stolen_bases = Batting_t.b_SB
 
     A = ((hits + walks) * stolen_bases)/(at_bats + walks)
-    return A
+
+    return round(A, 3)
 
 
 def getPlayerName(playerID):
