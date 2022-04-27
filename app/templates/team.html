@@ -30,7 +30,8 @@
         <tr>
             <td>Player Name</td>
             <td>Player Position</td>
-            <td>Time Played</td>
+            <td>Fielding Time</td>
+            <td>Offense Created</td>
         </tr>
         {% for row in allFielding %}
         <tr>
@@ -42,6 +43,9 @@
             </td>
             <td>
                 {{row.f_InnOuts if row.f_InnOuts else 'No Time Recorded'}}
+            </td>
+            <td>
+                {{runsCreated(row.playerID, yearIDSet)}}
             </td>
         </tr>
         {% endfor %}

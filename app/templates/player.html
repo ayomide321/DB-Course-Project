@@ -19,8 +19,12 @@
     </form>
 
     {% if person %}
+        <h2>{{playerImage(person.playerID)}}</h2>
         <h2>{{person.nameFirst}} {{person.nameLast}}</h2>
         <h2>{{person.birthYear}} - {{person.deathYear if person.deathYear else 'Not dead yet :)'}}</h2>
+    
+    {% else %}
+        <h2>No player</h2>
     {% endif %}
 
     {% if allFielding %}
@@ -29,7 +33,8 @@
             <td>Team Name</td>
             <td>Year</td>
             <td>Position</td>
-            <td>Time</td>
+            <td>Fielding Time</td>
+            <td>Offense Created</td>
         </tr>
         {% for row in allFielding %}
             <tr>
@@ -44,6 +49,9 @@
                 </td>
                 <td>
                     {{row.f_InnOuts if row.f_InnOuts else 'No Time Recorded'}}
+                </td>
+                <td>
+                    {{runsCreated(row.playerID, row.yearID)}}
                 </td>
             </tr>
         {% endfor %}

@@ -5,6 +5,8 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import User, People, Batting, Pitching, Fielding, Team, AuditTrail
 from datetime import datetime
+from urllib.request import urlopen
+
 
 
 @app.context_processor
@@ -12,8 +14,29 @@ def inject_user():
     return dict(ADMIN_NAME=app.config.get('ADMIN_NAME'))
 
 
+
+def playerImage(playerID):
+    url_fetch = "https://www.baseball-reference.com/players/" + playerID[0] + "/" + playerID + ".shtml"
+    fd = urlopen(url_fetch).read()
+
+    return url_fetch
+
 def getTeamName(teamID):
     return Team.query.filter_by(teamID=teamID).first().name
+
+def runsCreated(playerID, yearID):
+    Batting_t = Batting.query.filter_by(playerID=playerID, yearID=yearID).first()
+    Pitching_t = Pitching.query.filter_by(playerID=playerID, yearID=yearID).first()
+    walks = 0
+    if(Pitching_t):
+        walks = Pitching_t.p_BB
+    hits = Batting_t.b_H
+    at_bats = Batting_t.b_AB
+    stolen_bases = Batting_t.b_SB
+
+    A = ((hits + walks) * stolen_bases)/(at_bats + walks)
+    return A
+
 
 def getPlayerName(playerID):
     firstName = People.query.filter_by(playerID=playerID).first().nameFirst
@@ -104,7 +127,7 @@ def index():
     return render_template('team.html', teamPlayers=currentTeams, teamYears = currentYears,
                             allFielding = allFielding, getName = getPlayerName,
                             posName=getPositionName, teamID = teamID,
-                            yearIDSet=int(yearID))
+                            yearIDSet=int(yearID), runsCreated=runsCreated)
 
 
 @app.route('/players', defaults={'urlPlayerID': None}, methods=['GET', 'POST'])
@@ -134,7 +157,8 @@ def player(urlPlayerID):
         else:
             allFielding = Fielding.query.filter_by(playerID=currentPerson.playerID).all()
     logAuditTrail(actionType=actionType, playerID=auditPlayerID, yearID=year)
-    return render_template('player.html', title='Home', person=currentPerson, allFielding=allFielding, getTeamName=getTeamName, posName=getPositionName)
+    return render_template('player.html', title='Home', person=currentPerson,
+    allFielding=allFielding, getTeamName=getTeamName, posName=getPositionName, runsCreated=runsCreated, playerImage=playerImage)
 
 
 @app.route('/login', methods=['GET', 'POST'])
