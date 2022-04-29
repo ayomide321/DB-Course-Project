@@ -6,6 +6,7 @@ from app.forms import LoginForm, RegistrationForm
 from app.models import User, People, Batting, Pitching, Fielding, Team, AuditTrail
 from datetime import datetime
 from urllib.request import urlopen
+from bs4 import BeautifulSoup
 
 
 
@@ -18,9 +19,13 @@ def inject_user():
 def playerImage(playerID):
     url_fetch = "https://www.baseball-reference.com/players/" + playerID[0] + "/" + playerID + ".shtml"
     fd = urlopen(url_fetch).read()
+    soup = BeautifulSoup(fd)
+    image = soup.find_all("div", {"class": "media-item"})
+    image_src = image[0].img['src']
 
 
-    return url_fetch
+
+    return image_src
 
 def getTeamName(teamID):
     return Team.query.filter_by(teamID=teamID).first().name
@@ -28,13 +33,15 @@ def getTeamName(teamID):
 def runsCreated(playerID, yearID):
     Batting_t = Batting.query.filter_by(playerID=playerID, yearID=yearID).first()
     Pitching_t = Pitching.query.filter_by(playerID=playerID, yearID=yearID).first()
-    walks = 0
+    walks = hits = at_bats = stolen_bases =  1
     if(Pitching_t):
         walks = Pitching_t.p_BB
-    hits = Batting_t.b_H
-    at_bats = Batting_t.b_AB
-    stolen_bases = Batting_t.b_SB
-
+    if(Batting_t):
+        hits = Batting_t.b_H
+        at_bats = Batting_t.b_AB
+        if(Batting_t.b_SB):
+            stolen_bases = Batting_t.b_SB
+    print(hits, walks, stolen_bases, at_bats)
     A = ((hits + walks) * stolen_bases)/(at_bats + walks)
 
     return round(A, 3)
